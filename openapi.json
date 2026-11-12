@@ -1,0 +1,77 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NexusCommerce AI - Agentic Commerce Protocol",
+    "description": "OpenAPI specification for NexusCommerce AI, enabling automated multi-language SDK generation via APIMatic.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/api/agent/procure": {
+      "post": {
+        "summary": "Execute Autonomous Agentic Commerce Mission",
+        "description": "Submits a natural language procurement goal to the AI agent. Evaluates budget guardrails, decomposes line items, and initiates PayPal Orders v2 or Invoicing.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": { "type": "string", "example": "Procure 2 laptops under $2000" },
+                  "budget_limit": { "type": "number", "example": 2500.0 }
+                },
+                "required": ["prompt"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful procurement plan and PayPal transaction details."
+          }
+        }
+      }
+    },
+    "/api/ledger": {
+      "get": {
+        "summary": "Fetch Transaction Audit Ledger",
+        "description": "Retrieves the historical transaction stream for AG Grid visualization and finance compliance auditing.",
+        "responses": {
+          "200": {
+            "description": "Array of transaction audit logs."
+          }
+        }
+      }
+    },
+    "/api/paypal/capture-order": {
+      "post": {
+        "summary": "Capture PayPal Sandbox Order",
+        "description": "Executes final settlement of an authorized PayPal order.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "order_id": { "type": "string", "example": "ORDER-9182A4C" }
+                },
+                "required": ["order_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Order captured successfully." }
+        }
+      }
+    }
+  }
+}
+
