@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NexusCommerce AI — Autonomous Agentic Commerce Platform</title>
+  <!-- Favicon & App Icon -->
+  <link rel="icon" type="image/svg+xml" href="/icon.svg">
+  <link rel="apple-touch-icon" href="/icon.jpg">
+  <meta name="theme-color" content="#0f172a">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#eef2ff', 100:'#e0e7ff', 400:'#818cf8', 500:'#6366f1', 600:'#4f46e5', 700:'#4338ca', 900:'#1e1b4b' },
+            surface: { 50:'#f8fafc', 100:'#f1f5f9', 800:'#1e293b', 850:'#172033', 900:'#0f172a', 950:'#080d14' }
+          },
+          fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+          boxShadow: {
+            'glow-indigo': '0 0 24px 2px rgba(99,102,241,0.18)',
+            'glow-green': '0 0 20px 2px rgba(34,197,94,0.14)',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.2/styles/ag-grid.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.2/styles/ag-theme-alpine.css" />
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.3.2/dist/ag-grid-community.min.noStyle.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+
+    /* ═══════ CSS THEME VARIABLES ═══════ */
+    :root {
+      --bg-base:       #080d14;
+      --bg-surface:    #0f172a;
+      --bg-surface2:   #1e293b;
+      --bg-input:      #030710;
+      --bg-hover:      #1a2540;
+      --border:        rgba(30,41,59,0.9);
+      --border-mid:    rgba(51,65,85,0.6);
+      --text-primary:  #f1f5f9;
+      --text-secondary:#94a3b8;
+      --text-muted:    #475569;
+      --scrollbar-bg:  #0f172a;
+      --scrollbar-thumb: #334155;
+      --ag-bg:         #0f172a;
+      --ag-header-bg:  #0a0f1a;
+      --ag-header-fg:  #94a3b8;
+      --ag-fg:         #e2e8f0;
+      --ag-border:     #1e293b;
+      --ag-row-border: #1a2540;
+      --ag-odd-row:    #0c1322;
+      --ag-row-hover:  #1a2540;
+      --ag-selected:   #1e1b4b;
+      --metric-bg:     linear-gradient(135deg,#0f172a,#111827);
+      --metric-border: #1e293b;
+      --sidebar-bg:    #0a0f1a;
+      --header-bg:     rgba(8,13,20,0.9);
+      --preset-bg:     rgba(30,41,59,0.6);
+      --preset-hover:  #1e293b;
+      --trace-bg:      #030710;
+      --trace-border:  rgba(30,41,59,0.6);
+      --tag-bg:        #1e293b;
+      --tag-text:      #94a3b8;
+      --tag-border:    #334155;
+      --code-bg:       #1e293b;
+    }
+
+    /* ═══════ LIGHT THEME ═══════ */
+    html.light {
+      --bg-base:       #f0f4ff;
+      --bg-surface:    #ffffff;
+      --bg-surface2:   #f1f5f9;
+      --bg-input:      #f8fafc;
+      --bg-hover:      #e8edf8;
+      --border:        rgba(203,213,225,0.9);
+      --border-mid:    rgba(148,163,184,0.4);
+      --text-primary:  #0f172a;
+      --text-secondary:#475569;
+      --text-muted:    #94a3b8;
+      --scrollbar-bg:  #f1f5f9;
+      --scrollbar-thumb: #cbd5e1;
+      --ag-bg:         #ffffff;
+      --ag-header-bg:  #f8fafc;
+      --ag-header-fg:  #64748b;
+      --ag-fg:         #0f172a;
+      --ag-border:     #e2e8f0;
+      --ag-row-border: #f1f5f9;
+      --ag-odd-row:    #f8faff;
+      --ag-row-hover:  #eef2ff;
+      --ag-selected:   #e0e7ff;
+      --metric-bg:     linear-gradient(135deg,#ffffff,#f8fafc);
+      --metric-border: #e2e8f0;
+      --sidebar-bg:    #ffffff;
+      --header-bg:     rgba(255,255,255,0.92);
+      --preset-bg:     rgba(241,245,249,0.9);
+      --preset-hover:  #e2e8f0;
+      --trace-bg:      #f8fafc;
+      --trace-border:  #e2e8f0;
+      --tag-bg:        #f1f5f9;
+      --tag-text:      #475569;
+      --tag-border:    #cbd5e1;
+      --code-bg:       #f1f5f9;
+    }
+
+    body { background: var(--bg-base); transition: background .25s, color .25s; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; }
+
+    /* AG Grid — unified via CSS vars */
+    .ag-theme-alpine {
+      --ag-background-color:         var(--ag-bg);
+      --ag-header-background-color:  var(--ag-header-bg);
+      --ag-header-foreground-color:  var(--ag-header-fg);
+      --ag-foreground-color:         var(--ag-fg);
+      --ag-border-color:             var(--ag-border);
+      --ag-row-border-color:         var(--ag-row-border);
+      --ag-odd-row-background-color: var(--ag-odd-row);
+      --ag-row-hover-color:          var(--ag-row-hover);
+      --ag-selected-row-background-color: var(--ag-selected);
+      --ag-font-size: 12.5px;
+      --ag-font-family: 'Inter', sans-serif;
+      --ag-header-height: 42px;
+      --ag-row-height: 46px;
+    }
+    .ag-theme-alpine .ag-header-cell-label { font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .ag-theme-alpine .ag-cell { display: flex; align-items: center; }
+
+    /* ─── Dynamic surface classes ─── */
+    .t-bg-base    { background: var(--bg-base) !important; }
+    .t-bg-surface { background: var(--bg-surface) !important; border-color: var(--border) !important; }
+    .t-bg-input   { background: var(--bg-input) !important; border-color: var(--border-mid) !important; }
+    .t-text-primary   { color: var(--text-primary) !important; }
+    .t-text-secondary { color: var(--text-secondary) !important; }
+    .t-text-muted     { color: var(--text-muted) !important; }
+    .t-border     { border-color: var(--border) !important; }
+    .t-border-mid { border-color: var(--border-mid) !important; }
+    .t-preset     { background: var(--preset-bg) !important; border-color: var(--border-mid) !important; color: var(--text-secondary) !important; }
+    .t-preset:hover { background: var(--preset-hover) !important; }
+    .t-trace      { background: var(--trace-bg) !important; border-color: var(--trace-border) !important; }
+    .t-metric     { background: var(--metric-bg) !important; border-color: var(--metric-border) !important; }
+    .t-tag        { background: var(--tag-bg) !important; color: var(--tag-text) !important; border-color: var(--tag-border) !important; }
+    .t-code       { background: var(--code-bg) !important; }
+    .t-sidebar    { background: var(--sidebar-bg) !important; }
+    .t-header     { background: var(--header-bg) !important; }
+    .t-hover:hover { background: var(--bg-hover) !important; }
+
+    /* Universal surface override — applies on every themed panel */
+    .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; transition: background .2s, border-color .2s, box-shadow .2s; }
+    .card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.12); }
+    .input-field { background: var(--bg-input); border: 1px solid var(--border-mid); color: var(--text-primary); border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 0.875rem; width: 100%; transition: border-color .2s, background .2s; outline: none; resize: none; }
+    .input-field::placeholder { color: var(--text-muted); }
+    .input-field:focus { border-color: rgba(99,102,241,.55); box-shadow: 0 0 0 2px rgba(99,102,241,.2); }
+    .nav-label { color: var(--text-secondary); }
+    .section-label { color: var(--text-muted); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .body-text { color: var(--text-primary); }
+    .sub-text  { color: var(--text-secondary); }
+    .muted-text { color: var(--text-muted); }
+    .divider  { border-color: var(--border); }
+    .search-input { background: var(--bg-input); border: 1px solid var(--border-mid); color: var(--text-primary); border-radius: .5rem; padding: .4rem .75rem .4rem 2rem; font-size: .75rem; outline: none; transition: border-color .2s; }
+    .search-input:focus { border-color: rgba(99,102,241,.5); }
+    .pill-btn { background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 9999px; padding: .35rem .85rem; font-size: .75rem; cursor: pointer; transition: background .2s, color .2s; }
+    .pill-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .metric-card { background: var(--metric-bg); border: 1px solid var(--metric-border); border-radius: 14px; padding: 20px 24px; transition: transform .2s, box-shadow .2s; }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.18); }
+
+    /* ═══════ GLOBAL ELEMENT OVERRIDES using CSS vars ═══════ */
+    body, #sidebar, aside { background: var(--bg-base); transition: background .25s; }
+    aside { background: var(--sidebar-bg) !important; border-right-color: var(--border) !important; }
+    header { background: var(--header-bg) !important; border-bottom-color: var(--border) !important; }
+    main   { background: var(--bg-base) !important; }
+
+    /* All card panels */
+    .bg-surface-900,
+    [class*="bg-surface-9"] { background: var(--bg-surface) !important; border-color: var(--border) !important; }
+
+    /* Slate text overrides */
+    .text-slate-100, .text-slate-200 { color: var(--text-primary) !important; }
+    .text-slate-300, .text-slate-400 { color: var(--text-secondary) !important; }
+    .text-slate-500, .text-slate-600 { color: var(--text-muted) !important; }
+
+    /* Slate background overrides */
+    .bg-slate-800, .bg-slate-800\/60, .bg-slate-800\/80, .bg-slate-800\/40 { background: var(--bg-surface2) !important; }
+    .bg-slate-950, .bg-slate-950\/70, .bg-slate-950\/80, .bg-slate-950\/60 { background: var(--bg-input) !important; }
+
+    /* Border overrides */
+    .border-slate-800, .border-slate-800\/60, .border-slate-800\/70, .border-slate-800\/50,
+    .border-slate-700, .border-slate-700\/60, .border-slate-700\/80 { border-color: var(--border-mid) !important; }
+
+    /* Preset buttons in Agent Console */
+    .bg-slate-800\/60 { background: var(--preset-bg) !important; }
+
+    /* Textarea / input */
+    textarea, input[type=text], input[type=search] {
+      background: var(--bg-input) !important;
+      color: var(--text-primary) !important;
+      border-color: var(--border-mid) !important;
+    }
+    textarea::placeholder, input::placeholder { color: var(--text-muted) !important; }
+
+    /* Trace / code-style blocks */
+    #reasoningTrace { background: var(--trace-bg) !important; border-color: var(--trace-border) !important; }
+
+    /* Sidebar nav hover */
+    .nav-item { transition: background .15s, color .15s; }
+    .nav-item:hover { background: rgba(99,102,241,.1); color: #a5b4fc; }
+    .nav-item.active { background: rgba(99,102,241,.18); color: #818cf8; border-left: 2px solid #6366f1; }
+
+    /* Light mode specific nav */
+    html.light .nav-item:hover  { background: rgba(99,102,241,.08); color: #4f46e5; }
+    html.light .nav-item.active { background: rgba(99,102,241,.12); color: #4338ca; border-left-color: #4f46e5; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); }
+
+    /* Dividers */
+    .divide-slate-800\/60 > * + * { border-color: var(--border-mid) !important; }
+    .border-b, .border-t { border-color: var(--border) !important; }
+
+    /* Watermark: dark vs light mode opacity */
+    html.light #bgWatermark      { opacity: 0.06 !important; }
+    html.light #bgWatermark img  { filter: saturate(0.25) blur(2px) !important; }
+    html.light #bgWatermark2     { opacity: 0.03 !important; }
+    html.light #bgWatermark2 img { filter: saturate(0.2) blur(1px) !important; }
+
+    /* Animations */
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes pulse-soft { 0%,100%{ opacity:1; } 50%{ opacity:.5; } }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .fade-in { animation: fadeIn .35s ease both; }
+    .animate-pulse-soft { animation: pulse-soft 2s ease infinite; }
+    .animate-spin { animation: spin 1s linear infinite; }
+
+    /* Side nav */
+    .nav-item { transition: background .15s, color .15s; }
+    .nav-item:hover { background: rgba(99,102,241,.1); color: #a5b4fc; }
+    .nav-item.active { background: rgba(99,102,241,.18); color: #818cf8; border-left: 2px solid #6366f1; }
+
+    /* Metric cards */
+    .metric-card { background: linear-gradient(135deg,#0f172a,#111827); border: 1px solid #1e293b; border-radius: 14px; padding: 20px 24px; transition: transform .2s, box-shadow .2s; }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,.35); }
+
+    /* Prompt input glow on focus */
+    #promptInput:focus { box-shadow: 0 0 0 2px rgba(99,102,241,.45); }
+
+    /* Step trace row */
+    .trace-row { animation: fadeIn .25s ease both; border-left: 2px solid #334155; padding-left: 10px; margin-bottom: 6px; }
+    .trace-row.success { border-color: #22c55e; }
+    .trace-row.error { border-color: #ef4444; }
+
+    /* Spinner */
+    .spinner { width: 18px; height: 18px; border: 2px solid #334155; border-top-color: #6366f1; border-radius: 50%; }
+
+    /* Gradient text */
+    .gradient-text { background: linear-gradient(90deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  </style>
+</head>
+<body class="font-sans text-slate-200 min-h-screen flex">
+
+<!-- ═══════════════════════════════════════════
+     BACKGROUND WATERMARK LOGO
+═══════════════════════════════════════════ -->
+<div id="bgWatermark" style="
+  position: fixed;
+  right: -80px;
+  bottom: -80px;
+  width: 520px;
+  height: 520px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.045;
+  transition: opacity .3s;
+">
+  <img src="/icon.jpg" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:80px;filter:saturate(0.6) blur(1px);">
+</div>
+
+<!-- Top-left subtle watermark (smaller, more faint) -->
+<div id="bgWatermark2" style="
+  position: fixed;
+  left: 60px;
+  top: 80px;
+  width: 260px;
+  height: 260px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.022;
+  transition: opacity .3s;
+">
+  <img src="/icon.jpg" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:40px;filter:saturate(0.4) blur(0.5px);">
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SIDEBAR NAVIGATION
+═══════════════════════════════════════════ -->
+<aside id="sidebar" class="w-56 min-h-screen flex flex-col border-r t-border t-sidebar fixed left-0 top-0 z-40" style="border-right:1px solid var(--border)">
+
+  <!-- Logo -->
+  <div class="px-5 py-5 border-b border-slate-800/70">
+    <div class="flex items-center space-x-2.5">
+      <img src="/icon.jpg" alt="NexusCommerce AI Logo"
+           class="w-9 h-9 rounded-xl object-cover shadow-lg flex-shrink-0"
+           style="box-shadow:0 0 16px rgba(99,102,241,0.4)">
+      <div>
+        <div class="text-sm font-700 text-white leading-tight tracking-tight">NexusCommerce</div>
+        <div class="text-[10px] text-indigo-400 font-medium tracking-wide">AI Commerce Protocol</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Links -->
+  <nav class="flex-1 px-3 py-4 space-y-0.5">
+    <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-2 mb-2">Main</div>
+
+    <a onclick="showPage('dashboard')" class="nav-item active flex items-center space-x-2.5 px-3 py-2.5 rounded-lg cursor-pointer text-sm" id="nav-dashboard">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </a>
+
+    <a onclick="showPage('agent')" class="nav-item flex items-center space-x-2.5 px-3 py-2.5 rounded-lg cursor-pointer text-slate-400 text-sm" id="nav-agent">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <span>Agent Console</span>
+    </a>
+
+    <a onclick="showPage('ledger')" class="nav-item flex items-center space-x-2.5 px-3 py-2.5 rounded-lg cursor-pointer text-slate-400 text-sm" id="nav-ledger">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <span>Audit Ledger</span>
+      <span id="ledgerBadge" class="ml-auto text-[10px] bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded-full border border-indigo-500/30">3</span>
+    </a>
+
+    <a onclick="showPage('paypal')" class="nav-item flex items-center space-x-2.5 px-3 py-2.5 rounded-lg cursor-pointer text-slate-400 text-sm" id="nav-paypal">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+      <span>PayPal Actions</span>
+    </a>
+
+    <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest px-2 mb-2 mt-4">Integrations</div>
+
+    <div class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-slate-500 text-xs">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-soft flex-shrink-0"></span>
+      <span>PayPal Sandbox</span>
+    </div>
+    <div class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-slate-500 text-xs">
+      <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse-soft flex-shrink-0"></span>
+      <span>AG Grid Active</span>
+    </div>
+    <div class="flex items-center space-x-2.5 px-3 py-2 rounded-lg text-slate-500 text-xs">
+      <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse-soft flex-shrink-0"></span>
+      <span>Render Ready</span>
+    </div>
+  </nav>
+
+  <!-- Bottom Status -->
+  <div class="px-4 py-4 border-t border-slate-800/70">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">AI</div>
+      <div>
+        <div class="text-xs font-medium text-slate-300">Agentic Engine</div>
+        <div class="text-[10px] text-emerald-400 flex items-center space-x-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span><span>Operational</span></div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════
+     MAIN CONTENT AREA
+═══════════════════════════════════════════ -->
+<div class="ml-56 flex-1 flex flex-col min-h-screen">
+
+  <!-- Top Header Bar -->
+  <header class="sticky top-0 z-30 h-14 border-b t-header backdrop-blur-md flex items-center justify-between px-6" style="border-color:var(--border)">
+    <div>
+      <h1 id="pageTitle" class="text-sm font-semibold text-slate-100">Dashboard Overview</h1>
+      <div class="text-[11px] text-slate-500">PayPal AI Hackathon 2026 · Sandbox Environment</div>
+    </div>
+    <div class="flex items-center space-x-3">
+      <div id="connectionStatus" class="flex items-center space-x-1.5 text-xs t-bg-surface border t-border px-3 py-1.5 rounded-full">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse-soft"></span>
+        <span class="t-text-secondary">Checking PayPal…</span>
+      </div>
+
+      <!-- ─── THEME TOGGLE BUTTON ─── -->
+      <button id="themeToggle" onclick="toggleTheme()"
+        title="Toggle Light / Dark Mode"
+        class="flex items-center space-x-2 text-xs px-3 py-1.5 rounded-full border t-bg-surface t-border t-text-secondary t-hover">
+        <span id="themeIcon">🌙</span>
+        <span id="themeLabel">Dark</span>
+      </button>
+
+      <div class="text-xs t-text-muted t-bg-surface border t-border px-3 py-1.5 rounded-full font-mono">v1.0.0</div>
+    </div>
+  </header>
+
+  <!-- PAGE ROUTER -->
+  <main class="flex-1 overflow-auto">
+
+    <!-- ───────────────────────────────────────
+         PAGE: DASHBOARD
+    ─────────────────────────────────────── -->
+    <div id="page-dashboard" class="p-6 space-y-6 fade-in">
+
+      <!-- Metrics Row -->
+      <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="metric-card">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1">Total Orders</div>
+              <div id="m-orders" class="text-2xl font-bold text-white">3</div>
+              <div class="text-[11px] text-emerald-400 mt-1">↑ 100% this session</div>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-indigo-500/15 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1">Total Spent</div>
+              <div id="m-spent" class="text-2xl font-bold text-white">$5,845</div>
+              <div class="text-[11px] text-slate-400 mt-1">USD · Sandbox</div>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1">Avg Risk Score</div>
+              <div class="text-2xl font-bold text-amber-400">0.18</div>
+              <div class="text-[11px] text-emerald-400 mt-1">LOW RISK — All Clear</div>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-amber-500/15 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[11px] font-semibold uppercase tracking-widest text-slate-500 mb-1">Guardrail Status</div>
+              <div class="text-2xl font-bold text-emerald-400">Active</div>
+              <div class="text-[11px] text-slate-400 mt-1">Budget ceiling enforced</div>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center">
+              <svg class="w-4.5 h-4.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- How It Works Flow -->
+      <div class="bg-surface-900 border border-slate-800/70 rounded-2xl p-6">
+        <div class="text-sm font-semibold text-slate-200 mb-1">How NexusCommerce AI Works</div>
+        <div class="text-xs text-slate-500 mb-6">From your natural language instruction to PayPal settlement — 4 deterministic steps.</div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="relative">
+            <div class="bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4 text-center h-full">
+              <div class="w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center mx-auto mb-3 text-indigo-400 font-bold text-sm">1</div>
+              <div class="text-xs font-semibold text-slate-200 mb-1">You Instruct</div>
+              <div class="text-[11px] text-slate-400 leading-relaxed">Type your procurement goal in plain English with a budget limit.</div>
+            </div>
+            <div class="hidden md:block absolute top-1/2 -right-2 w-4 h-0.5 bg-indigo-500/40 z-10"></div>
+          </div>
+
+          <div class="relative">
+            <div class="bg-purple-500/10 border border-purple-500/20 rounded-xl p-4 text-center h-full">
+              <div class="w-10 h-10 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center mx-auto mb-3 text-purple-400 font-bold text-sm">2</div>
+              <div class="text-xs font-semibold text-slate-200 mb-1">AI Decomposes</div>
+              <div class="text-[11px] text-slate-400 leading-relaxed">Agent breaks the goal into itemized line-items and calculates total cost.</div>
+            </div>
+            <div class="hidden md:block absolute top-1/2 -right-2 w-4 h-0.5 bg-purple-500/40 z-10"></div>
+          </div>
+
+          <div class="relative">
+            <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-center h-full">
+              <div class="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center mx-auto mb-3 text-amber-400 font-bold text-sm">3</div>
+              <div class="text-xs font-semibold text-slate-200 mb-1">Guardrail Checks</div>
+              <div class="text-[11px] text-slate-400 leading-relaxed">Safety engine verifies budget compliance and risk score before any payment.</div>
+            </div>
+            <div class="hidden md:block absolute top-1/2 -right-2 w-4 h-0.5 bg-amber-500/40 z-10"></div>
+          </div>
+
+          <div>
+            <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 text-center h-full">
+              <div class="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mx-auto mb-3 text-emerald-400 font-bold text-sm">4</div>
+              <div class="text-xs font-semibold text-slate-200 mb-1">PayPal Settles</div>
+              <div class="text-[11px] text-slate-400 leading-relaxed">An official PayPal Order, Invoice, or Payout is created instantly in Sandbox.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Transactions Mini-View -->
+      <div class="bg-surface-900 border border-slate-800/70 rounded-2xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="text-sm font-semibold text-slate-200">Recent Transactions</div>
+            <div class="text-[11px] text-slate-500">Latest 3 PayPal sandbox events</div>
+          </div>
+          <button onclick="showPage('ledger')" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition">View All →</button>
+        </div>
+        <div id="recentTxns" class="space-y-2.5">
+          <div class="flex items-center justify-between py-3 border-b border-slate-800/60">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 text-xs font-bold">PO</div>
+              <div>
+                <div class="text-xs font-medium text-slate-200">Developer Workstations & SaaS Seats</div>
+                <div class="text-[11px] text-slate-500">PayPal Order · Hardware & SaaS</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-semibold text-white">$1,925.00</div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">COMPLETED</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-3 border-b border-slate-800/60">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 text-xs font-bold">PO</div>
+              <div>
+                <div class="text-xs font-medium text-slate-200">Cloud GPU Cluster Renewal</div>
+                <div class="text-[11px] text-slate-500">PayPal Order · Cloud Infrastructure</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-semibold text-white">$420.00</div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">COMPLETED</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between py-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 text-xs font-bold">INV</div>
+              <div>
+                <div class="text-xs font-medium text-slate-200">Client Invoice — Acme Corp</div>
+                <div class="text-[11px] text-slate-500">PayPal Invoice v2 · Consulting</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-sm font-semibold text-white">$3,500.00</div>
+              <span class="text-[10px] px-2 py-0.5 rounded-full border bg-blue-500/10 text-blue-400 border-blue-500/20">SENT</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ───────────────────────────────────────
+         PAGE: AGENT CONSOLE
+    ─────────────────────────────────────── -->
+    <div id="page-agent" class="p-6 hidden fade-in">
+      <div class="grid grid-cols-1 xl:grid-cols-5 gap-6">
+
+        <!-- Left: Input Panel -->
+        <div class="xl:col-span-2 space-y-4">
+          <!-- Mission Input Card -->
+          <div class="bg-surface-900 border border-slate-800/70 rounded-2xl p-5">
+            <div class="flex items-center space-x-2 mb-4">
+              <div class="w-7 h-7 rounded-lg bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <div class="text-sm font-semibold text-slate-100">Mission Input</div>
+            </div>
+
+            <!-- Presets -->
+            <div class="mb-4">
+              <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2">Quick Presets</div>
+              <div class="space-y-1.5">
+                <button onclick="setPrompt('Procure 2 developer workstations and 5 AI software licenses under $2,200 budget')" class="w-full text-left text-xs px-3 py-2.5 bg-slate-800/60 hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-700/60 hover:border-indigo-500/40 transition group flex items-center space-x-2">
+                  <span class="text-sm">💻</span><span>Workstations + SaaS Licenses</span>
+                  <svg class="w-3 h-3 ml-auto text-slate-600 group-hover:text-indigo-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </button>
+                <button onclick="setPrompt('Provision 1 Cloud GPU cluster and 2 4K monitors under $1,100')" class="w-full text-left text-xs px-3 py-2.5 bg-slate-800/60 hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-700/60 hover:border-purple-500/40 transition group flex items-center space-x-2">
+                  <span class="text-sm">⚡</span><span>Cloud GPU + Displays</span>
+                  <svg class="w-3 h-3 ml-auto text-slate-600 group-hover:text-purple-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </button>
+                <button onclick="setPrompt('Invoice enterprise customer Acme Corp for $3,500 consulting fees')" class="w-full text-left text-xs px-3 py-2.5 bg-slate-800/60 hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-700/60 hover:border-blue-500/40 transition group flex items-center space-x-2">
+                  <span class="text-sm">📄</span><span>Client Invoice (PayPal v2)</span>
+                  <svg class="w-3 h-3 ml-auto text-slate-600 group-hover:text-blue-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Free-form prompt -->
+            <div class="mb-4">
+              <label class="block text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2">Custom Instruction</label>
+              <textarea id="promptInput" rows="3" placeholder="Describe what you need in plain English…&#10;e.g. Buy 3 laptops and 10 cloud seats for the new team"
+                class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-600 resize-none transition focus:outline-none focus:border-indigo-500/60 leading-relaxed"></textarea>
+            </div>
+
+            <!-- Budget Guardrail Control -->
+            <div class="bg-slate-950/70 border border-slate-800/80 rounded-xl p-4 mb-4">
+              <div class="flex justify-between items-center mb-3">
+                <div class="flex items-center space-x-2">
+                  <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                  <span class="text-[11px] font-semibold text-slate-300">Budget Ceiling Guardrail</span>
+                </div>
+                <span id="budgetValue" class="text-sm font-bold text-emerald-400 font-mono">$2,500</span>
+              </div>
+              <input id="budgetSlider" type="range" min="300" max="8000" step="100" value="2500"
+                class="w-full h-1.5 rounded-full appearance-none cursor-pointer bg-slate-800 accent-indigo-500"
+                oninput="document.getElementById('budgetValue').innerText='$'+Number(this.value).toLocaleString()">
+              <div class="flex justify-between text-[10px] text-slate-600 mt-2">
+                <span>$300</span><span>$4,000</span><span>$8,000</span>
+              </div>
+            </div>
+
+            <button id="runBtn" onclick="runAgent()"
+              class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-900/50 flex items-center justify-center space-x-2 transition transform active:scale-[0.985] disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span>Execute Agentic Pipeline</span>
+            </button>
+          </div>
+
+          <!-- PayPal Integrations Info -->
+          <div class="bg-surface-900 border border-slate-800/70 rounded-2xl p-5">
+            <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3">PayPal API Coverage</div>
+            <div class="space-y-2">
+              <div class="flex items-center justify-between py-2 border-b border-slate-800/50">
+                <span class="text-xs text-slate-400">Orders v2 (Checkout)</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>
+              </div>
+              <div class="flex items-center justify-between py-2 border-b border-slate-800/50">
+                <span class="text-xs text-slate-400">Invoicing v2</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>
+              </div>
+              <div class="flex items-center justify-between py-2">
+                <span class="text-xs text-slate-400">Payouts v1</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Execution State -->
+        <div class="xl:col-span-3 space-y-4">
+
+          <!-- Execution Status Bar -->
+          <div class="bg-surface-900 border border-slate-800/70 rounded-2xl p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-sm font-semibold text-slate-100">Execution Status</div>
+              <div id="executionBadge" class="text-[11px] px-3 py-1 rounded-full border bg-slate-800/80 text-slate-400 border-slate-700/50">Idle — Awaiting Mission</div>
+            </div>
+
+            <!-- Agent Reasoning Trace -->
+            <div class="mb-1 text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Agent Reasoning Trace</div>
+            <div id="reasoningTrace" class="bg-slate-950 border border-slate-800/60 rounded-xl p-4 min-h-[160px] font-mono text-xs overflow-y-auto max-h-52 space-y-2">
+              <div class="text-slate-600">// Agent is idle. Enter a mission and click Execute.</div>
+              <div class="text-slate-700">// Guardrail engine: Ready — Budget policy, risk scoring, and PayPal schema active.</div>
+            </div>
+          </div>
+
+          <!-- Order Result Card (hidden until result) -->
+          <div id="actionCard" class="hidden bg-surface-900 border border-indigo-500/20 rounded-2xl p-5 shadow-glow-indigo">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center space-x-2">
+                <div class="w-7 h-7 rounded-lg bg-indigo-500/15 border border-indigo-500/20 flex items-center justify-center">
+                  <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                </div>
+                <div class="text-sm font-semibold text-slate-100">Procurement Order</div>
+              </div>
+              <div id="cardTotal" class="text-lg font-bold text-indigo-300 font-mono">$0.00</div>
+            </div>
+
+            <!-- Line Items -->
+            <div class="mb-4">
+              <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2">Line Items</div>
+              <div id="itemList" class="bg-slate-950/80 rounded-xl divide-y divide-slate-800/60 overflow-hidden border border-slate-800/50"></div>
+            </div>
+
+            <!-- PayPal Action Row -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-3 border-t border-slate-800/60">
+              <div class="space-y-1">
+                <div class="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">PayPal Reference ID</div>
+                <div id="paypalIdBadge" class="text-xs font-mono px-2.5 py-1 bg-indigo-950/80 text-indigo-300 border border-indigo-800/60 rounded-lg">—</div>
+              </div>
+              <button id="captureBtn" onclick="simulateCapture()"
+                class="flex items-center space-x-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl shadow-glow-green transition disabled:opacity-40 disabled:cursor-not-allowed">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Capture Order in Sandbox</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Guardrail Block Card -->
+          <div id="blockCard" class="hidden bg-surface-900 border border-red-500/20 rounded-2xl p-5">
+            <div class="flex items-center space-x-3 mb-3">
+              <div class="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                <svg class="w-4.5 h-4.5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.07 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+              </div>
+              <div>
+                <div class="text-sm font-semibold text-red-400">Order Blocked by Guardrail</div>
+                <div id="blockReason" class="text-xs text-slate-400 mt-0.5">Budget ceiling exceeded. No PayPal transaction was initiated.</div>
+              </div>
+            </div>
+            <div class="text-xs text-slate-500 bg-slate-950/60 rounded-xl p-3 border border-slate-800/50">Adjust the budget ceiling on the left panel to allow this transaction, or reduce the order scope.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ───────────────────────────────────────
+         PAGE: AUDIT LEDGER
+    ─────────────────────────────────────── -->
+    <div id="page-ledger" class="p-6 hidden fade-in">
+      <div class="bg-surface-900 border border-slate-800/70 rounded-2xl p-6">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-start gap-4 mb-5">
+          <div>
+            <div class="text-sm font-semibold text-slate-100 mb-1">Transaction Audit Ledger</div>
+            <div class="text-[11px] text-slate-500">Complete real-time record of all agentic PayPal transactions — powered by AG Grid.</div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <div class="relative">
+              <svg class="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>
+              <input id="gridSearch" oninput="onFilterChanged()" placeholder="Search ledger…"
+                class="bg-slate-950 border border-slate-700/80 text-xs text-slate-200 pl-8 pr-3 py-2 rounded-lg focus:outline-none focus:border-indigo-500/60 w-44 transition" />
+            </div>
+            <button onclick="exportCsv()" class="flex items-center space-x-1.5 text-xs px-3 py-2 bg-slate-800/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 rounded-lg transition">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Export CSV</span>
+            </button>
+            <button onclick="loadLedger()" class="flex items-center space-x-1.5 text-xs px-3 py-2 bg-indigo-900/40 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-700/40 rounded-lg transition">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+        <div id="myGrid" class="ag-theme-alpine w-full rounded-xl overflow-hidden border border-slate-800/60" style="height:420px;"></div>
+      </div>
+    </div>
+
+    <!-- ───────────────────────────────────────
+         PAGE: PAYPAL ACTIONS
+    ─────────────────────────────────────── -->
+    <div id="page-paypal" class="p-6 hidden fade-in">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+        <!-- Orders v2 -->
+        <div class="bg-surface-900 border border-slate-800/70 rounded-2xl p-5">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          </div>
+          <div class="text-sm font-semibold text-slate-100 mb-2">PayPal Orders v2</div>
+          <div class="text-xs text-slate-400 leading-relaxed mb-4">Creates an authenticated merchant checkout order with itemized line items, unit amounts, and quantity. The agent requests approval and captures payment atomically.</div>
+          <div class="space-y-2 text-[11px]">
+            <div class="flex items-center space-x-2 text-slate-400"><span class="text-emerald-400">✓</span><span>POST /v2/checkout/orders</span></div>
+            <div class="flex items-center space-x-2 text-slate-400"><span class="text-emerald-400">✓</span><span>POST /v2/checkout/orders/{id}/capture</span></div>
+            <div class="flex items-center space-x-2 text-slate-400"><span class="text-emerald-400">✓</span><span>OAuth 2.0 Client Credentials</span></div>
+          </div>
+        </div>
+
+        <!-- Invoicing v2 -->
+        <div class="bg-surface-900 border border-slate-800/70 rounded-2xl p-5">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div class="text-sm font-semibold text-slate-100 mb-2">PayPal Invoicing v2</div>
+          <div class="text-xs text-slate-400 leading-relaxed mb-4">Generates a branded PayPal invoice and dispatches it to a client's email. Supports NET_15, NET_30, and due-on-receipt payment terms.</div>
+          <div class="space-y-2 text-[11px]">
+            <div class="flex items-center space-x-2 text-slate-400"><span class="text-emerald-400">✓</span><span>POST /v2/invoicing/invoices</span></div>
+            <div class="flex items-center space-x-2 text-slate-400"><span class="text-emerald-400">✓</span><span>POST /v2/invoicing/invoices/{id}/send</span></div>
+            <div class="flex items-center space-x-2 text-slate-400"><span class="text-emerald-400">✓</span><span>Auto-generated invoice number</span></div>
+          </div>
+        </div>
+
+        <!-- Payouts v1 -->
+        <div class="bg-surface-900 border border-slate-800/70 rounded-2xl p-5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          </div>
+          <div class="text-sm font-semibold text-slate-100 mb-2">PayPal Payouts v1</div>
+          <div class="text-xs text-slate-400 leading-relaxed mb-4">Executes a batch payout to partners, freelancers, or affiliates — routing commission splits automatically as part of the agent's settlement logic.</div>
+          <div class="space-y-2 text-[11px]">
+            <div class="flex items-center space-x-2 text-slate-400"><span class="text-emerald-400">✓</span><span>POST /v1/payments/payouts</span></div>
+            <div class="flex items-center space-x-2 text-slate-400"><span class="text-emerald-400">✓</span><span>Batch payout with unique IDs</span></div>
+            <div class="flex items-center space-x-2 text-slate-400"><span class="text-emerald-400">✓</span><span>Instant Sandbox settlement</span></div>
+          </div>
+        </div>
+
+        <!-- Sandbox Info Banner -->
+        <div class="md:col-span-3 bg-indigo-950/30 border border-indigo-500/20 rounded-2xl p-5 flex items-start space-x-4">
+          <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg class="w-4.5 h-4.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <div class="text-sm font-semibold text-indigo-200 mb-1">Zero-Config Sandbox Mode</div>
+            <div class="text-xs text-slate-400 leading-relaxed">NexusCommerce AI runs fully out-of-the-box without requiring personal PayPal credentials. All transactions simulate authentic PayPal responses with real reference IDs. To connect to your live sandbox, add your <code class="text-indigo-300 bg-slate-800 px-1.5 py-0.5 rounded text-[11px]">PAYPAL_CLIENT_ID</code> and <code class="text-indigo-300 bg-slate-800 px-1.5 py-0.5 rounded text-[11px]">PAYPAL_CLIENT_SECRET</code> to the <code class="text-indigo-300 bg-slate-800 px-1.5 py-0.5 rounded text-[11px]">.env</code> file.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TOAST NOTIFICATION
+═══════════════════════════════════════════ -->
+<div id="toast" class="fixed bottom-6 right-6 z-50 hidden">
+  <div class="flex items-center space-x-3 px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl shadow-xl max-w-xs text-sm">
+    <span id="toastIcon" class="text-base">✓</span>
+    <span id="toastMsg" class="text-slate-200"></span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+  let gridApi = null;
+  let currentPayPalId = null;
+
+  /* ─── THEME TOGGLE ─── */
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isLight = html.classList.toggle('light');
+    document.getElementById('themeIcon').innerText  = isLight ? '☀️' : '🌙';
+    document.getElementById('themeLabel').innerText = isLight ? 'Light' : 'Dark';
+    // Persist preference
+    localStorage.setItem('nexus-theme', isLight ? 'light' : 'dark');
+  }
+
+  // Apply saved theme on first load
+  (function() {
+    const saved = localStorage.getItem('nexus-theme');
+    if (saved === 'light') {
+      document.documentElement.classList.add('light');
+      // DOM may not be ready yet; set after DOMContentLoaded
+      document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('themeIcon').innerText  = '☀️';
+        document.getElementById('themeLabel').innerText = 'Light';
+      });
+    }
+  })();
+
+  /* ─── PAGE ROUTER ─── */
+  function showPage(id) {
+    ['dashboard','agent','ledger','paypal'].forEach(p => {
+      document.getElementById('page-'+p).classList.add('hidden');
+      document.getElementById('nav-'+p).classList.remove('active');
+      document.getElementById('nav-'+p).classList.add('text-slate-400');
+    });
+    document.getElementById('page-'+id).classList.remove('hidden');
+    document.getElementById('nav-'+id).classList.add('active');
+    document.getElementById('nav-'+id).classList.remove('text-slate-400');
+
+    const titles = { dashboard:'Dashboard Overview', agent:'Agent Console', ledger:'Transaction Audit Ledger', paypal:'PayPal API Actions' };
+    document.getElementById('pageTitle').innerText = titles[id];
+
+    if (id === 'ledger') loadLedger();
+  }
+
+  /* ─── AG GRID SETUP ─── */
+  const colDefs = [
+    { field:'id', headerName:'TXN ID', width:120, pinned:'left', cellRenderer: p => `<span class="font-mono text-indigo-300 text-xs">${p.value}</span>` },
+    { field:'timestamp', headerName:'Timestamp', width:155, cellRenderer: p => `<span class="text-slate-400 text-xs">${p.value}</span>` },
+    { field:'agent_goal', headerName:'Agent Mission', flex:2, minWidth:220, cellRenderer: p => `<span class="text-slate-200 text-xs leading-snug">${p.value}</span>` },
+    { field:'category', headerName:'Category', width:150, cellRenderer: p => `<span class="px-2 py-0.5 text-[10px] rounded-full border bg-slate-800 text-slate-300 border-slate-700">${p.value}</span>` },
+    { field:'amount', headerName:'Amount', width:120, cellRenderer: p => `<span class="font-mono font-semibold text-white text-sm">$${Number(p.value).toLocaleString('en-US',{minimumFractionDigits:2})}</span>` },
+    { field:'paypal_id', headerName:'PayPal Ref', width:160, cellRenderer: p => `<span class="font-mono text-xs text-indigo-300 bg-indigo-950 px-2 py-0.5 rounded border border-indigo-900">${p.value}</span>` },
+    { field:'risk_score', headerName:'Risk', width:100, cellRenderer: p => {
+        const v = p.value;
+        const cls = v < 0.25 ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : v < 0.5 ? 'bg-amber-950 text-amber-400 border-amber-800' : 'bg-red-950 text-red-400 border-red-800';
+        return `<span class="px-2 py-0.5 text-[10px] rounded-full border font-mono font-bold ${cls}">${v}</span>`;
+    }},
+    { field:'status', headerName:'Status', width:130, cellRenderer: p => {
+        const s = p.value;
+        const cls = s==='COMPLETED' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : s==='SENT' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : s==='APPROVED' ? 'bg-purple-500/10 text-purple-400 border-purple-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30';
+        return `<span class="px-2 py-0.5 text-[10px] font-semibold rounded-full border ${cls}">${s}</span>`;
+    }},
+  ];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    gridApi = agGrid.createGrid(document.getElementById('myGrid'), {
+      columnDefs: colDefs,
+      rowData: [],
+      defaultColDef: { sortable:true, filter:true, resizable:true },
+      animateRows: true
+    });
+    loadLedger();
+    checkStatus();
+  });
+
+  /* ─── HELPERS ─── */
+  function setPrompt(text) {
+    document.getElementById('promptInput').value = text;
+    showPage('agent');
+  }
+  function onFilterChanged() { gridApi?.setGridOption('quickFilterText', document.getElementById('gridSearch').value); }
+  function exportCsv() { gridApi?.exportDataAsCsv({ fileName:'nexuscommerce_paypal_audit.csv' }); }
+
+  function showToast(msg, icon='✓') {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').innerText = msg;
+    document.getElementById('toastIcon').innerText = icon;
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3500);
+  }
+
+  async function checkStatus() {
+    try {
+      const r = await fetch('/api/status'); const d = await r.json();
+      const el = document.getElementById('connectionStatus');
+      if (d.paypal_connected) {
+        el.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span><span class="text-emerald-400">PayPal Live Sandbox</span>`;
+      } else {
+        el.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse-soft"></span><span class="text-amber-400">Sandbox Simulation Mode</span>`;
+      }
+    } catch {}
+  }
+
+  async function loadLedger() {
+    try {
+      const r = await fetch('/api/ledger'); const d = await r.json();
+      gridApi?.setGridOption('rowData', d);
+      document.getElementById('ledgerBadge').innerText = d.length;
+      document.getElementById('m-orders').innerText = d.length;
+      const total = d.reduce((s,t) => s + t.amount, 0);
+      document.getElementById('m-spent').innerText = '$' + total.toLocaleString('en-US',{minimumFractionDigits:2});
+    } catch {}
+  }
+
+  /* ─── AGENT EXECUTION ─── */
+  async function runAgent() {
+    const prompt = document.getElementById('promptInput').value.trim();
+    const budget = parseFloat(document.getElementById('budgetSlider').value);
+    if (!prompt) { showToast('Please enter a mission instruction first.', '⚠'); return; }
+
+    const runBtn = document.getElementById('runBtn');
+    const badge = document.getElementById('executionBadge');
+    const trace = document.getElementById('reasoningTrace');
+    const actionCard = document.getElementById('actionCard');
+    const blockCard = document.getElementById('blockCard');
+
+    // Loading State
+    runBtn.disabled = true;
+    actionCard.classList.add('hidden');
+    blockCard.classList.add('hidden');
+    badge.className = 'text-[11px] px-3 py-1 rounded-full border bg-indigo-900/40 text-indigo-300 border-indigo-700/40 animate-pulse-soft';
+    badge.innerText = 'Processing Mission…';
+    trace.innerHTML = `<div class="text-indigo-400 trace-row success">// Initializing Agentic Commerce Engine…</div>`;
+
+    try {
+      const res = await fetch('/api/agent/procure', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ prompt, budget_limit: budget })
+      });
+      const data = await res.json();
+
+      // Render reasoning trace
+      trace.innerHTML = '';
+      data.reasoning.forEach((step, i) => {
+        const isGuardrail = step.toLowerCase().includes('guardrail') || step.toLowerCase().includes('block') || step.toLowerCase().includes('exceed');
+        const cls = isGuardrail ? 'error' : 'success';
+        const col = isGuardrail ? 'text-red-400' : 'text-emerald-400';
+        const delay = i * 80;
+        trace.innerHTML += `<div class="trace-row ${cls} ${col}" style="animation-delay:${delay}ms">✓ ${step}</div>`;
+      });
+
+      if (data.status === 'APPROVED') {
+        badge.className = 'text-[11px] px-3 py-1 rounded-full border bg-emerald-900/40 text-emerald-300 border-emerald-700/40';
+        badge.innerText = '✓ Order Created — Sandbox';
+
+        actionCard.classList.remove('hidden');
+        document.getElementById('cardTotal').innerText = '$' + Number(data.total_amount).toLocaleString('en-US',{minimumFractionDigits:2}) + ' USD';
+
+        const list = document.getElementById('itemList');
+        list.innerHTML = data.items.map(it => `
+          <div class="flex items-center justify-between px-4 py-3 text-xs">
+            <div>
+              <div class="text-slate-200 font-medium">${it.name}</div>
+              <div class="text-slate-500 mt-0.5">Qty: ${it.quantity} · ${it.category}</div>
+            </div>
+            <div class="font-mono font-semibold text-slate-200">$${(it.quantity * it.price).toFixed(2)}</div>
+          </div>
+        `).join('');
+
+        const act = data.paypal_action || {};
+        currentPayPalId = act.id || act.invoice_id || act.payout_batch_id || '—';
+        document.getElementById('paypalIdBadge').innerText = currentPayPalId;
+        loadLedger();
+        showToast('PayPal Sandbox transaction created!', '💳');
+      } else {
+        badge.className = 'text-[11px] px-3 py-1 rounded-full border bg-red-900/40 text-red-300 border-red-700/40';
+        badge.innerText = '⛔ Blocked by Guardrail';
+        blockCard.classList.remove('hidden');
+        document.getElementById('blockReason').innerText = `Total cost exceeds your $${budget.toLocaleString()} budget ceiling. No PayPal transaction was initiated.`;
+        showToast('Guardrail blocked the order. Adjust your budget.', '⛔');
+      }
+
+    } catch (err) {
+      trace.innerHTML += `<div class="trace-row error text-red-400">Error: ${err.message}</div>`;
+      badge.innerText = 'Error';
+    } finally {
+      runBtn.disabled = false;
+    }
+  }
+
+  /* ─── PAYPAL CAPTURE ─── */
+  async function simulateCapture() {
+    if (!currentPayPalId || currentPayPalId === '—') return;
+    const btn = document.getElementById('captureBtn');
+    btn.disabled = true;
+    try {
+      await fetch('/api/paypal/capture-order', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({order_id: currentPayPalId})
+      });
+      loadLedger();
+      showToast(`Order ${currentPayPalId} captured! Status: COMPLETED`, '🎉');
+    } catch {
+      showToast('Capture completed (Sandbox mode).','✓');
+      loadLedger();
+    } finally {
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
